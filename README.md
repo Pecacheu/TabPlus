@@ -1,3 +1,5 @@
+![Promo Image](https://user-images.githubusercontent.com/3608878/219253308-bf13ab8b-f072-49a5-bcd3-cb091ed858d4.png)
+
 Tab++ is an extension for Chrome, Edge, Brave, and other Chromium-based browsers that allows you to save your tabs for later. You can organize, categorize, and name them, then restore individual tabs or tab groups at any time. You can even sync them across devices!
 
 Tab++ is inspired by similar extensions like OneTab, only with **WAY** more features... Like folders, cloud-syncing, easy backup and restore, and more!
