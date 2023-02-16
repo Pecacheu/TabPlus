@@ -55,7 +55,7 @@ function Uploader(extList, parent, maxFiles, doneMsg) {
 			onDropExit();
 		} else {
 			const n = files[f].name;
-			if(extList && extList.indexOf(n.substr(n.lastIndexOf('.')).toLowerCase()) == -1) { //Check extention
+			if(extList && extList.indexOf(n.substr(n.lastIndexOf('.')).toLowerCase()) == -1) {
 				setText(ErrorTextL+"Invalid file type"+ErrorTextR); onDropExit(); return;
 			}
 			readFile(files[f], function(data) { //Read file contents

@@ -1,102 +1,54 @@
 //TabPlus Background Service. Ray 2016, All rights reserved
 
-//-- Compile-Time (not really) Settings:
+'use strict';
+let window={},history={back:()=>{},forward:()=>{}};
+class HTMLCollection{}; class Element{};
+importScripts("utils.js", "tabmanager.js");
 
-var NameFilter = /[^ -.0-\[\]^_a-z|]/g, //Same as [^a-zA-Z0-9!-.:-@[-_| ]. Or use [^ -_a-z|] to allow '\' and '/'
-NameMaxLen = 30, //Max name len: <= 30
-MaxSyncTablistTabs = 50;
-
-//-- Event Listeners & Initialization:
-
-var tabPlus; includeScript("tabmanager.js", function() {
-	tabPlus = new TabManager(false).loadOptions(); openMainPage();
-});
-
-function openMainPage(initData) {
-	var urlSearch = chrome.extension.getURL("tabplus.html");
-	var urlName = "tabplus.html#"; if(initData) urlName += encodeURIComponent(initData);
-	chrome.tabs.query({url:urlSearch}, function(tabs) {
-		if(tabs.length == 0) chrome.tabs.create({url:urlName});
-		else {
-			//If there's more than one, close all but the first.
-			for(var i=1,l=tabs.length; i<l; i++) chrome.tabs.remove(tabs[i].id);
-			//And focus the tab.
-			chrome.tabs.update(tabs[0].id, {active:true,url:urlName});
-			chrome.windows.update(tabs[0].windowId, {focused:true});
+const delay=ms => new Promise(r => setTimeout(r,ms)),
+TabPlus=new TabManager(), Svc={
+	getOpt:async o => TabPlus[o],
+	openMainPage:async data => {
+		let ser=chrome.runtime.getURL("tabplus.html"), uri="tabplus.html";
+		if(data) uri+='#'+encodeURIComponent(data);
+		let tabs=await chrome.tabs.query({url:ser});
+		if(!tabs.length) chrome.tabs.create({url:uri}); else {
+			tabs.each(t => chrome.tabs.remove(t.id),1);
+			await chrome.tabs.update(tabs[0].id, {active:true,url:uri});
+			await chrome.windows.update(tabs[0].windowId, {focused:true});
 		}
-	});
-}
-
-//-- Background Service Functions:
-
-function runTabSaver(tabs, saveType) {
-	var tabList = [genDate()], pastActive = false,
-	i=0, l=tabs.length; tabPlus.loadTabStore(function(s) {if(s && l>0) tabTimer()});
-	function tabTimer() {
-		doTabRead(); i++;
-		if(i<l) { if((i-1)%tabPlus.NoDelayTabs==tabPlus.NoDelayTabs-1) setTimeout
-		(tabTimer, tabPlus.TabDelay); else tabTimer(); } else saveTablist();
-	}
-	function doTabRead() {
-		var tab = tabs[i]; if(tab.active) pastActive = true;
-		if(tab.id && !isSystemTab(tab)) {
-			if((saveType == "left" && !pastActive) ||
-			(saveType == "right" && pastActive && !tab.active) ||
-			(saveType != "left" && saveType != "right")) {
-				console.log("Tab "+tab.index+": "+tab.title);
-				tabList.push([tab.title, tab.url]);
-				chrome.tabs.remove(tab.id);
+	}, runTabSaver:async (tabs, type) => {
+		let l=tabs.length; if(!l) return;
+		let tList=[genDate()],i=0,tab,pastAct,nd=TabPlus.NoDelayTabs;
+		await TabPlus.loadTabStore();
+		while(i<l) {
+			tab=tabs[i++]; if(tab.active) pastAct=1;
+			if(tab.id && !isSystemTab(tab) && ((type == "left" && !pastAct) ||
+			(type == "right" && pastAct && !tab.active) || (type != "left" && type != "right"))) {
+				tList.push([tab.title, tab.url]); chrome.tabs.remove(tab.id);
 			}
+			if(i&&i%nd==0) await delay(TabPlus.TabDelay);
 		}
-	}
-	function saveTablist() { if(tabList.length > 1) {
-		console.log("Tab List:",tabList);
-		var name = autogenName(tabPlus.localTabStore);
-		tabPlus.writeTabs(name, tabList, function(s) {
-			if(s) openMainPage(name);
-		});
-	}}
-}
-
-function runTabOpener(tablist, windowId) {
-	chrome.windows.get(windowId, {populate:true}, function(currWindow) {
-		if(tabPlus.NewWindows == 0 || (tabPlus.NewWindows == 1 && currWindow.tabs.length <= 2)) addTabs(currWindow);
-		else chrome.windows.create({url:addTabs(true)});
-	});
-	function addTabs(win) {
-		var winId=win.id,tabs=[]; for(var i=1,l=tablist.length; i<l; i++) {
-			if(win === true) tabs.push(tablist[i][1]); else chrome.tabs
-			.create({windowId:winId,url:tablist[i][1],selected:false});
-		}
-		if(win === true) return tabs;
+		console.log("Tab List:",tList);
+		if(tList.length<2) throw "The selected option(s) cannot be saved!";
+		try {await TabPlus.writeTabs(tList)} catch(e) {await Svc.runTabOpener(tList);throw e}
+		await Svc.openMainPage('local/');
+	}, runTabOpener:async (tList, winID) => {
+		let win; if(winID) win=await chrome.windows.get(winID, {populate:true});
+		if(!winID || TabPlus.NewWindows || !(TabPlus.NewWindows==1 && win.tabs.length<=2)) win=null;
+		let tabs=[]; tList.each(t => {
+			if(win) chrome.tabs.create({windowId:win.id,url:t[1],selected:false}); else tabs.push(t[1]);
+		},1);
+		if(!win) chrome.windows.create({url:tabs});
 	}
 }
+function isSystemTab(tab) {return tab.url.startsWith('chrome:') || tab.url.startsWith('chrome-extension:')}
 
-function genDate() {
-	var d = new Date(); return d.getMonth()+"."+d.getDate()+"."+
-	d.getFullYear()+"."+d.getHours()+"."+d.getMinutes()+"."+d.getSeconds();
-}
-
-function autogenName(dirContent) {
-	var num=0; while(dirContent["_"+num]||dirContent["~_"+num]) num++; return "_"+num;
-}
-
-function findName(name, dirContent) {
-	name = name.replace(NameFilter, "").trim(); if(!dirContent[name] && !dirContent["~"+name]) return name;
-	var num=1; while(dirContent[name+" ("+num+")"]||dirContent["~"+name+" ("+num+")"]) num++; return name+" ("+num+")";
-}
-
-var start = false; function startup() {
-	if(!start) { start = true; return true; }
-	return false;
-}
-
-//-- Internal Functions:
-
-function isSystemTab(tab) { var n = tab.url; return n.indexOf("chrome://")==0 || n.indexOf("chrome-extension://")==0; }
-
-function includeScript(src, callback) {
-	var scr = document.createElement('script'); scr.src = src;
-	scr.addEventListener('load', callback, false);
-	document.head.appendChild(scr);
-}
+TabPlus.loadOpts();
+chrome.runtime.onInstalled.addListener(()=>Svc.openMainPage());
+chrome.runtime.onConnect.addListener(p => p.onMessage.addListener(async m => {
+	if(m.t=='run') {
+		let r,e; try {r=await Svc[m.a.shift()].apply(null,m.a)} catch(er) {e=er}
+		try {p.postMessage({r:r,c:m.c,e:e?e.toString():null})} catch(e) {}
+	}
+}));

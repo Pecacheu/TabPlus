@@ -6,14 +6,14 @@
 		<meta name="viewport" content="width=device-width,initial-scale=0.8,maximum-scale=0.8,user-scalable=no">
 		<!-- Link Stylesheets and Libraries -->
 		<link rel="stylesheet" type="text/css" href="theme/tabplus.css"></link>
-		<link rel="stylesheet" type="text/css" href="theme/uploader.css"></link><script src="uploader.js"></script>
-        <script src="tabmanager.js"></script>
-		<script src="interface.js"></script>
+		<link rel="stylesheet" type="text/css" href="theme/uploader.css"></link>
+		<script src="utils.js"></script><script src="uploader.js"></script>
+		<script src="tabmanager.js"></script><script src="interface.js"></script>
 		<script src="tabplus.js"></script>
 	</head>
 	<body style="overflow:hidden">
 		<header>
-			<img src="icon.svg"><div id=tabStats>Total: ? Tabs (? Synced)</div>
+			<img src=icon.svg><div id=tabStats>Loading...</div>
 			<div id=pathBox><div id=pathBar></div><div id=nFold>New Folder</div></div>
 			<div id=navBox>
 				<div id=saveSel class=opt>Save To File</div><div id=loadSel class=opt>Load Save File</div>
@@ -22,12 +22,12 @@
 		</header>
 		<div id=loader class="cCont full">
 			<div class=full style="position:fixed">Note: Help available in the options page.</div>
-			<div class=cItem><object id=logo data="icon.svg" height="50%"></object></div>
+			<object id=logo data=icon.svg></object>
 		</div>
-		<div id=content><div class=tWrap><table class=filetable><tbody id=files></tbody></table></div></div>
+		<div id=cont><div id=fTab class=tWrap><table class=fTable><tbody id=folders></tbody></table></div><span id=cData></span></div>
 		<div class="popup full" style="display:none;opacity:0">
 			<div style="display:table-row"><div id=uClose><img src="theme/cancel.svg"> Close</div></div>
-			<div id=uContainer></div>
+			<div id=uCont></div>
 		</div>
 	</body>
 </html>
