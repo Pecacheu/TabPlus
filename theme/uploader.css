@@ -1,0 +1,43 @@
+/* Visually based on a CSS Tricks post by Osvaldas Valutis */
+
+/* File Uploader Box */
+
+.upFileBox {
+	outline:2px dashed #92b0b3; outline-offset:-10px; color:#0f3c4b;
+	font-family:"Roboto"; font-weight:400; font-size:20px; display:table;
+	transition:outline-offset .15s ease-in-out, background-color .15s linear;
+	background-color:#c8dadf; user-select:none; width:100%; height:100%;
+}
+
+.upDragOver { outline-offset:-20px; outline-color:#c8dadf; background-color:#fff; }
+
+/* Centering */
+
+.upFileBox .upContents {
+	width:100%; text-align:center; vertical-align:middle; display:table-cell;
+}
+
+/* Box Content Style */
+
+.upFileBox .icon {
+	width:100%; height:80px; margin-bottom:40px; background:#92b0b3;
+	-webkit-mask:url(upload.svg) no-repeat center / contain;
+}
+
+.upFileBox input { display:none; }
+.upFileBox label { cursor:pointer; }
+
+.upFileBox strong { font-weight:bold; }
+.upContents > label:hover strong,
+.upContents > span:hover strong { color:#39bfd3; }
+
+.doneAnim {
+	animation:doneAppear .25s ease-in-out;
+	display:inline-block;
+}
+
+@keyframes doneAppear {
+	0%   { transform:scale(0); }
+	75%  { transform:scale(1.1); }
+	100% { transform:scale(1); }
+}

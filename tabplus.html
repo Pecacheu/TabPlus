@@ -1,0 +1,33 @@
+<!-- TabPlus Main Page. Ray 2016, All rights reserved -->
+<html>
+	<head>
+		<title>TabPlus</title>
+		<!-- Configure Mobile Device Scaling -->
+		<meta name="viewport" content="width=device-width,initial-scale=0.8,maximum-scale=0.8,user-scalable=no">
+		<!-- Link Stylesheets and Libraries -->
+		<link rel="stylesheet" type="text/css" href="theme/tabplus.css"></link>
+		<link rel="stylesheet" type="text/css" href="theme/uploader.css"></link><script src="uploader.js"></script>
+        <script src="tabmanager.js"></script>
+		<script src="interface.js"></script>
+		<script src="tabplus.js"></script>
+	</head>
+	<body style="overflow:hidden">
+		<header>
+			<img src="icon.svg"><div id=tabStats>Total: ? Tabs (? Synced)</div>
+			<div id=pathBox><div id=pathBar></div><div id=nFold>New Folder</div></div>
+			<div id=navBox>
+				<div id=saveSel class=opt>Save To File</div><div id=loadSel class=opt>Load Save File</div>
+				<div class=navHold><div class="navTab sel" id=lTab>Local</div><div class=navTab id=sTab>Synced</div></div>
+			</div>
+		</header>
+		<div id=loader class="cCont full">
+			<div class=full style="position:fixed">Note: Help available in the options page.</div>
+			<div class=cItem><object id=logo data="icon.svg" height="50%"></object></div>
+		</div>
+		<div id=content><div class=tWrap><table class=filetable><tbody id=files></tbody></table></div></div>
+		<div class="popup full" style="display:none;opacity:0">
+			<div style="display:table-row"><div id=uClose><img src="theme/cancel.svg"> Close</div></div>
+			<div id=uContainer></div>
+		</div>
+	</body>
+</html>

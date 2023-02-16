@@ -1,0 +1,61 @@
+@font-face {
+	font-family:'Roboto'; font-style:normal; font-weight:100;
+	src: local('Roboto Thin'), local('Roboto-Thin'),
+	url(type/RobotoThin.woff2) format('woff2');
+}
+@font-face {
+	font-family:'Roboto'; font-style:normal; font-weight:400;
+	src: local('Roboto'), local('Roboto-Regular'),
+	url(type/RobotoReg.woff2) format('woff2');
+}
+@font-face {
+	font-family:'Roboto'; font-style:normal; font-weight:500;
+	src: local('Roboto Medium'), local('Roboto-Medium'),
+	url(type/RobotoMid.woff2) format('woff2');
+}
+@font-face {
+	font-family:'Ubuntu Titling';
+	src: url(type/UbuntuTitling-Bold-webfont.woff) format('woff');
+}
+
+body {
+	margin:0px; color:#fff; overflow:hidden;
+	min-width:200px; background-image:url(popupbg.png);
+	font-family:"Roboto"; font-weight:500; font-size:14px;
+	box-shadow:inset 0 0 210px rgba(0,0,0,0.7);
+}
+
+/* Header & Footer Style */
+
+header {
+	font-family:"Ubuntu Titling"; font-size:38px;
+	height:45px; border-bottom:1px solid #e1ddd8;
+	background:rgba(0,0,0,0.3); cursor:pointer;
+}
+
+footer {
+	height:24px; padding:6px; text-align:center;
+	border-top:1px solid #e1ddd8; background:rgba(0,0,0,0.3);
+}
+
+/* Menu Items */
+
+*[role="button"] { cursor:pointer; transition:background 0.5s ease-out; }
+*[role="button"]:hover { background:#888; }
+
+ul { margin:0; padding:0; }
+li { list-style-type:none; white-space:nowrap; }
+
+#wrapper { padding:30px 20px 20px 20px; }
+#menu { border-bottom:1px dashed #a5a4a1; }
+.menuItem {
+	width:100%; height:36px; display:table;
+	border-top:1px dashed #a5a4a1;
+}
+
+/* Text/Image Centering */
+
+.cCont { width:100%; display:inline-table; } .cRow { display:table-row; }
+.cItem { text-align:center; vertical-align:middle; display:table-cell; width:50%; }
+.cItemL { text-align:left; vertical-align:middle; display:table-cell; }
+.cItemR { text-align:right; vertical-align:middle; display:table-cell; }
