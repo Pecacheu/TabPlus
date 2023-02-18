@@ -1,7 +1,9 @@
 //TabPlus Interface. Ray 2016, All rights reserved
 
 'use strict';
-const GUI=new function() {
+const LoadOvf=100, //Load Overflow Margin
+GCooldown=50, //Allow-Grab Delay
+GUI=new function() {
 
 //--- Animated Content Loader
 
@@ -98,7 +100,7 @@ this.TabList=function(title, tList) {
 	//Tab Table
 	this.nf=name; let wrap=utils.mkDiv(cData,'tWrap'),
 	tbl=utils.mkEl('tbody',utils.mkEl('table',wrap,'tabs'));
-	tbl.parentNode.tl=this;
+	tbl.parentNode.tl=sum.tl=this;
 
 	utils.define(this, 'locked', ()=>locked);
 	utils.define(this, 'name', ()=>(locked?'~':'')+this.fName);
@@ -115,7 +117,7 @@ this.TabList=function(title, tList) {
 	this.newTab=(data,idx) => {tList.splice(idx+1,0,data),addTab(data,idx)}
 	this.bCheck=() => {
 		let r=wrap.boundingRect; if(r.y<utils.h+LoadOvf && r.y2>0)
-			this.update(),removeEventListener('scroll',scroll);
+			this.update(),removeEventListener('scroll',scroll),this.bCheck=0;
 	}
 
 	//Private
@@ -132,7 +134,6 @@ this.TabList=function(title, tList) {
 		//Drag & Drop
 		makeGrabable(tab, name.parentNode, ()=>(locked&&tab.index)?false:genTl(tab), tTrans);
 	}, delTab=async (e,tab,del) => {
-		console.log(e,tab,del);
 		if(e.shiftKey) { //Open if not X icon
 			e.preventDefault();
 			if(!del) await TabService('runTabOpener', tList, chrome.windows.WINDOW_ID_CURRENT);
@@ -177,25 +178,24 @@ this.TabList=function(title, tList) {
 
 //--- Item Drag & Drop API
 
-Grabber.cooldown=80;
 function setCur(c) {DB.className=c?'grab'+c:null}
 function makeGrabable(el,btn,down,up) {
 	let ev,rm=() => {removeEventListener(ev.u,rm),removeEventListener(ev.m,cm),setCur(ev=null)},
 	cb=async e => {
 		let md=e.type=='mousedown', u=md?'mouseup':'touchend', m=md?'mousemove':'touchmove';
 		if(!md && e.touches.length>1) return; addEventListener(u,rm),addEventListener(m,cm);
-		ev={u:u,m:m}; await utils.delay(Grabber.cooldown); if(ev&&!ev.t) setCur('M'),ev.e=e;
+		ev={u:u,m:m}; await utils.delay(GCooldown); if(ev&&!ev.t) setCur('M'),ev.e=e;
 	}, cm=e => {
 		if(!ev.e) return ev.t=1; e=ev,rm(); let dl=down();
 		if(dl!==false) new Grabber(el,e.e,dl).ondrop=up;
 	}
 	btn.addEventListener('mousedown',cb), btn.addEventListener('touchstart',cb);
 }
-function Grabber(el,e,dLists,hitBox) {
+function Grabber(el,e,dLists,hitBox=10) {
 	const par=el.parentElement, rect=el.boundingRect, rects=[],
 	sRects=[], sr=utils.mkDiv(DB,'grabScroll',{top:DB.scrollHeight}),
 	iSX=scrollX, iSY=scrollY, sInd=el.index, self=this;
-	let mX,mY,oX,oY,tNum,sel; hitBox=hitBox||10,dLists=dLists||[par];
+	let mX,mY,oX,oY,tNum,sel; dLists=dLists||[par];
 	//Get Initial Cursor/Touch Pos
 	if(e) {
 		let t=e; if(e.type=='touchstart') t=e.changedTouches[0], tNum=t.identifier;
@@ -298,7 +298,7 @@ function parseDate(date) {
 	let time=(hours>9?hours:'0'+hours)+':'+(mins>9?mins:'0'+mins)+':'+(secs>9?secs:'0'+secs);
 	return date+' at '+time+' '+sfx;
 }
-function isInWeek(now, date, month, year) {
+function isInWeek(now,date,month,year) {
 	let nd=new Date(now), y=nd.getFullYear(), m=nd.getMonth(), d=nd.getDate(), cnt=0;
 	while(y>year || m>month || d>date) {
 		nd.setDate(d-1), y=nd.getFullYear(), m=nd.getMonth(), d=nd.getDate();

@@ -1,7 +1,7 @@
 //HTML5 Uploader API 1.15. Ray 2016, All rights reserved
 //Requires 'uploader.css' & 'upload.svg'
 
-"use strict";
+'use strict';
 function Uploader(extList, parent, maxFiles, doneMsg) {
 	//-- Settings:
 	const LabelText = "<strong>Choose a file</strong> or drag it here.",
@@ -74,17 +74,17 @@ function Uploader(extList, parent, maxFiles, doneMsg) {
 
 	//-- Helpful Functions:
 	function makeEl(tag, cls, par) {
-		var el = document.createElement(tag);
+		let el = document.createElement(tag);
 		if(cls) el.className = cls; if(par) par.appendChild(el);
 		return el;
 	}
 	function setText(txt) {
-		var lStl = label.style, tStl = text.style;
+		let lStl = label.style, tStl = text.style;
 		if(txt == LabelText || txt.indexOf("<i>Error") == 0) { label.innerHTML = txt; lStl.display = null; tStl.display = "none"; }
 		else { text.innerHTML = txt; lStl.display = "none"; tStl.display = null; text.className = txt==DoneText?"doneAnim":''; }
 	}
 	function readFile(f, cb) {
-		var reader = new FileReader(); reader.readAsBinaryString(f);
+		let reader = new FileReader(); reader.readAsBinaryString(f);
 		reader.onload = function(e) { cb(e.target.result); };
 	}
 }

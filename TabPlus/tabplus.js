@@ -1,40 +1,14 @@
 //TabPlus Main Script. Ray 2016, All rights reserved.
 
-/*TODO:
-- Implement extension options
-- Minify CSS and JS files to save space
-
-if(!window.DLIST) window.DLIST=[],window.dRem=() => {window.DLIST.each(d => d.remove());window.DLIST=[]};
-if(window.DLIST.length<150) {window.DLIST.push(utils.mkDiv(document.body,null,{top:r.top+scrollY,left:r.left+scrollX,position:'absolute',width:r.w,height:r.h,background:'rgba(255,0,0,.3)'}))}
-function cleanupAll(dirSet) {
-	var fCnt = 0; function subCleanup(fPath) {
-		var f = tabPlus.readDir(fPath, IsLocal), sk = Object.keys(f), si;
-		for(var i=0,l=sk.length; i<l; i++) { si = f[sk[i]];
-			var snt = sk[i].replace(tabService.NameFilter, "").trim();
-			if(si instanceof Array && sk[i][0] == '~') snt = '~'+snt; //<-- These chars are allowed only at start, and only for tablists.
-			if(sk[i] != snt) { tabPlus.rename(fPath, sk[i], snt, IsLocal); console.log("cleanup renamed tablist",sk[i],"from",(IsLocal?"local":"sync")+fPath,"to",snt); sk[i] = snt; }
-			if(si instanceof Array) { if(si.length <= 1) { tabPlus.remove(sk[i], fPath, IsLocal); console.log("cleanup removed tablist",sk[i],"from",(IsLocal?"local":"sync")+fPath); }}
-			else {
-				if(!fPath) fCnt++; subCleanup(fPath+'/'+sk[i]);
-				if(!Object.keys(si).length) { tabPlus.remove(sk[i], fPath, IsLocal); console.log("cleanup removed folder",sk[i],"from",(IsLocal?"local":"sync")+fPath); if(!fPath) fCnt--; }
-			}
-		}
-	}
-	subCleanup(""); if(dirSet !== false) { Path = ""; DirContent = sortFolder("") || {}; }
-	files.parentNode.parentNode.style.display = fCnt?null:"none";
-}*/
 const NewTxt=`Welcome to TabPlus!\n\n\
 Changes in ${VER}:\n\
-- Ported to the new manifest v3 API.\n\
-- Total codebase rewrite with asynchronous architecture and service workers, for massively improved performance and stability.\n\
-- Fixed graphical bugs on loading screen in newer Chrome(/Chromium) versions.\n\
-- More error messages (instead of failing silently, without telling you!)\n\
-- Automatic restore-from-backup on critical sync error. Say no more to the sync tab eating your tabs into the void because your internet is slow.\n\
-- INFINITE SCROLLING! (Yeah boiii, now you can legit have 10,000+ tabs with zero lag! Tabs load via pop-in, as you scroll, similar to Discord and other messengers.)\n\n\
+- Code minified to save space\n\
+- Fixed version name glitch\n\
+- Adjusted drag delay\n\
+- Dragging a tablist triggers a view redraw as it should\n\n\
 TIP: Try holding shift while moving, dragging, or deleting tabs. It's pretty handy!`;
 
 'use strict';
-const LoadOvf=100; //Load Overflow Margin
 let DB, TabPlus, Path,
 DirCont, LoadFlag;
 
@@ -60,8 +34,7 @@ function initLoad() {
 }
 function setFromHash() {
 	let p=decodeURIComponent(location.hash.substr(1));
-	if(p==Path) return; setPath(p); //Auto-switch tab if no content:
-	//if(!Object.keys(DirCont).length) setPath(isSync(p)?'local/':'sync/');
+	if(p==Path) return; setPath(p);
 }
 
 async function drawPage() {
@@ -110,10 +83,11 @@ function sortFolder(p) {
 	return nd;
 }
 
-function flush() {TabPlus.set(Path,DirCont)}
+function reChk() {cData.children.each(t => {if(t.tl&&t.tl.bCheck) t.tl.bCheck()})}
 async function doSync(all) {try {
 	if(await TabPlus.awaitSync(all?[0,1]:isSync())) return;
-	flush(); await TabPlus.sync(all?null:isSync()); setBar();
+	TabPlus.set(Path,DirCont); reChk();
+	await TabPlus.sync(all?null:isSync()); setBar();
 } catch(e) {hErr(e)}}
 
 function readAll() {
@@ -205,11 +179,11 @@ function mixTLists(a,b) {
 
 GUI.onFolderMoved=async (n,np) => {
 	if(await TabPlus.awaitSync()) return; console.log("Move folder",n,"to",np);
-	n+='/'; await TabPlus.moveFolder(Path+n,np+n); DirCont=sortFolder(Path);
+	n+='/'; await TabPlus.moveFolder(Path+n,np+n); DirCont=sortFolder(Path),reChk();
 }
 GUI.onTabsMoved=async (n,np) => {
 	if(await TabPlus.awaitSync()) return; console.log("Move tabs",n,"to",np);
-	await TabPlus.moveTabList(Path+n,np); DirCont=sortFolder(Path);
+	await TabPlus.moveTabList(Path+n,np); DirCont=sortFolder(Path),reChk();
 }
 GUI.onTabMoved=async (np,d) => {
 	if(await TabPlus.awaitSync()) return; console.log("Move tab",d,"to",np);
