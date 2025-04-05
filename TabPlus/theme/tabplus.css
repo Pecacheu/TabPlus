@@ -136,7 +136,8 @@ header img { height:64px; vertical-align:middle; }
 
 /* Folders */
 .fTable td { border-top:1px solid #eee; }
-.fTable td.icon { background:#5299e2; -webkit-mask:url(folder.svg) center / 14px 16px no-repeat; }
+.fTable td.icon { background:#5299e2; mask:url(folder.svg) center / 14px 16px no-repeat; }
+.fTable td.icon.del { background:url(cancel.svg) center / 14px 16px no-repeat; mask:none; }
 .fTable td.name { color:#5299e2; }
 .fTable td.name div { padding:3px 6px; border-radius:2px; display:inline-block; transition:background 0.5s ease-out; }
 .fTable td.name input {
@@ -183,4 +184,4 @@ body.grabM * { cursor:move !important; }
 body.grabN * { cursor:no-drop !important; }
 
 /* Folder Grab */
-.fTable .grabDrop td.icon { -webkit-mask:url(upload.svg) center / 14px 16px no-repeat; }
+.fTable .grabDrop td.icon { mask:url(upload.svg) center / 14px 16px no-repeat; }

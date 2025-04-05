@@ -77,7 +77,7 @@ function TabManager(useTabs) {
 	this.getTabs=s => tabs[s];
 	this.readDir=(path,rec) => {
 		let d=tStore(path,1),k,pl,st,p={}; path=d[1],d=d[0],pl=path.length;
-		for(k in d) if(k.length>pl && k.startsWith(path)) {
+		for(k in d) if(k.startsWith(path)) {
 			if(rec || (st=k.indexOf('/',pl))==-1) p[k.substr(pl)]=d[k];
 			else p[k.substring(pl,st)]=1;
 		}
@@ -113,8 +113,8 @@ function TabManager(useTabs) {
 		tabs[0]['/'+n]=tl; await this.sync(0); return l+n;
 	}
 	//Set TabLists (not folders)
-	this.set=(path,tl,nDel) => {
-		DS(); let k,d=tStore(path,1),od=this.readDir(path); path=d[1],d=d[0];
+	this.set=(path,tl,nDel,rec) => {
+		DS(); let k,d=tStore(path,1),od=this.readDir(path,rec); path=d[1],d=d[0];
 		if(!nDel) for(k in od) if(Array.isArray(od[k])) delete d[path+k];
 		for(k in tl) if(Array.isArray(tl[k])) d[path+k]=tl[k];
 	}

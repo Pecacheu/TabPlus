@@ -2,10 +2,8 @@
 
 const NewTxt=`Welcome to TabPlus!\n\n\
 Changes in ${VER}:\n\
-- Code minified to save space\n\
-- Fixed version name glitch\n\
-- Adjusted drag delay\n\
-- Dragging a tablist triggers a view redraw as it should\n\n\
+- Delete entire folder by holding shift\n\
+- Deduplicate TabLists on import\n\n\
 TIP: Try holding shift while moving, dragging, or deleting tabs. It's pretty handy!`;
 
 'use strict';
@@ -150,6 +148,7 @@ function loadFromDisk() {
 			await saveToDisk("backup");
 			if(lt && !rp.checked) lt=mixTLists(TabPlus.getTabs(0),lt);
 			if(st && !rp.checked) st=mixTLists(TabPlus.getTabs(1),st);
+			if(lt) deDup(lt); if(st) deDup(st);
 			await TabPlus.loadTabStore([lt,st]); setPath();
 		}
 	}
@@ -173,6 +172,17 @@ function mixTLists(a,b) {
 		a[k+(l?'~':'')+t]=v;
 	}
 	return a;
+}
+function deDup(tl) {
+	let kl=Object.keys(tl),i=0,l=kl.length,lo=l,r,k,t,n,v;
+	for(; i<l; ++i) {
+		t=tl[kl[i]], n=t.length;
+		for(r=i+1; r<l; ++r) if((k=tl[kl[r]]).length === n) {
+			for(v=1; v<n; ++v) if(t[v][1] !== k[v][1]) {v=null;break}
+			if(v !== null) delete tl[kl[r]],kl.splice(r,1),--l;
+		}
+	}
+	if(l!==lo) console.log("Dedup",lo,"->",l,tl);
 }
 
 //-- Events
@@ -199,6 +209,12 @@ GUI.onTabsLocked=GUI.onNameChange=async (ot,nt,fd) => {
 	}
 }
 GUI.onTabsRemoved=async t => {console.log("Remove",t),delete DirCont[t],doSync()}
+GUI.onFolderDel=async n => {
+	if(await TabPlus.awaitSync()) return;
+	let p=Path+n+'/'; console.log("Del folder",p);
+	TabPlus.set(p,[],0,1); await TabPlus.sync(isSync());
+	setPath(Path);
+}
 
 //-- Support
 

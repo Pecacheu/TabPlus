@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "TabPlus",
 	"short_name": "Tab++",
-	"version": "1.7.1",
+	"version": "1.7.2",
 	"description": "The most feature-packed tab manager. Save & organize your tabs, sync across devices!",
 	"icons": {"32": "icon32.png", "256": "icon256.png"},
 	"background": {

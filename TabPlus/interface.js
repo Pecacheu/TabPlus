@@ -44,14 +44,21 @@ function getCssRule(n) {
 //--- Folder Generation
 
 this.addFolder=(name, date, onclick, nameable) => {
-	fTab.hidden=0; let row=utils.mkEl('tr',folders);
-	utils.mkEl('td',row,'icon'); row.setAttribute('role','button');
+	fTab.hidden=0; let row=utils.mkEl('tr',folders),
+	ico=utils.mkEl('td',row,'icon'); row.setAttribute('role','button');
 	let tn=utils.mkDiv(row.nf=utils.mkEl('td',row,'name'));
 	utils.mkEl('td',row,'date').textContent=parseDate(date);
 	tn.textContent=row.fName=name; onclick=onclick.bind(row);
-	row.onclick=() => {if(!row.edit&&!row.moving)onclick()};
+	row.onclick=e => {if(!e.shiftKey&&!row.edit&&!row.moving)onclick()};
 	if(nameable) {
-		tn.onclick=() => GUI.renameFolder(row); makeGrabable(row,row,genFl,fTrans);
+		makeGrabable(row,row,genFl,fTrans);
+		tn.onclick=() => GUI.renameFolder(row);
+		row.onmouseover=row.onmousemove=e => {
+			if(e.shiftKey) ico.classList.add('del');
+			else ico.classList.remove('del');
+		}
+		row.onmouseout=() => ico.classList.remove('del');
+		ico.onclick=e => {if(e.shiftKey)GUI.onFolderDel(name).catch(hErr)}
 	} else row.system=1;
 	return row;
 }
