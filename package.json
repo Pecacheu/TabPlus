@@ -1,0 +1,10 @@
+{
+	"type": "module",
+	"scripts": {
+		"prepare": "node build"
+	},
+	"dependencies": {
+		"chalk": "^5.4.1",
+		"html-minifier-terser": "^7.2.0"
+	}
+}
