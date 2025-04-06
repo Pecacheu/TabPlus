@@ -77,7 +77,8 @@ this.renameFolder=(row, TL) => {try {
 	txt.type="text", txt.value=ot, txt.onblur=tEdit;
 	document.addEventListener('keyup',tEdit); txt.focus();
 	(txt.oninput=() => {
-		let v=txt.value; if(v.length>TabPlus.NameMaxLen) txt.value=v=v.substr(0,TabPlus.NameMaxLen);
+		let v=txt.value;
+		if(v.length>TabPlus.NameMaxLen) txt.value=v=v.substr(0,TabPlus.NameMaxLen);
 		txt.style.width=utils.textWidth(v,getComputedStyle(txt).font)+20;
 	})();
 	async function tEdit(t) {try {
@@ -124,7 +125,7 @@ this.TabList=function(title, tList) {
 	this.newTab=(data,idx) => {tList.splice(idx+1,0,data),addTab(data,idx)}
 	this.bCheck=() => {
 		let r=wrap.boundingRect; if(r.y<utils.h+LoadOvf && r.y2>0)
-			this.update(),removeEventListener('scroll',scroll),this.bCheck=0;
+			this.update(),removeEventListener('scroll',this.bCheck),this.bCheck=0;
 	}
 
 	//Private

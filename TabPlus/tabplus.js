@@ -1,19 +1,23 @@
-//TabPlus Main Script. Ray 2016, All rights reserved.
+//TabPlus Main Script. Ray 2016, All rights reserved
 
 const NewTxt=`Welcome to TabPlus!\n\n\
 Changes in ${VER}:\n\
-- Delete entire folder by holding shift\n\
-- Deduplicate TabLists on import\n\n\
-TIP: Try holding shift while moving, dragging, or deleting tabs. It's pretty handy!`;
+- Dark mode, woot!\n\
+- Implement more settings in options page.\n\
+- Confirmation prompt before clearing all data.\n\
+- Don't save pinned tabs by default (configurable).\n\
+- Bug fixes & improvements to automatic corruption recovery.\n\n\
+TIP: Check the options page for usage help, dark mode, and more.`;
 
 'use strict';
-let DB, TabPlus, Path,
+let DB, DC, TabPlus, Path,
 DirCont, LoadFlag;
 
 window.onload=async () => {try {
-	DB=document.body, GUI.runIconLoader(), TabServiceInit(),
+	DB=document.body, DC=document.documentElement.classList;
+	GUI.runIconLoader(); TabServiceInit();
 	(TabPlus=new TabManager(1)).onFirstLoad=() => alert(NewTxt);
-	await TabPlus.loadTabStore(), await utils.delay(600), initLoad();
+	await TabPlus.loadTabStore(); await utils.delay(600); initLoad();
 } catch(e) {hErr(e)}}
 
 //-- Page Control
@@ -61,6 +65,7 @@ function setBar() {
 	tabStats.textContent=`${TabPlus.totalTabs} Tabs (${TabPlus.totalUse} Sync Used)`;
 }
 function setPath(p) {try {
+	if(TabPlus.opts.DarkMode) DC.add('dark'); else DC.remove('dark');
 	if(!LoadFlag) GUI.runIconLoader(1); if(!p) p='local/';
 	console.log('setPath',p);
 	if(isSync(p)) lTab.classList.remove('sel'),sTab.classList.add('sel');

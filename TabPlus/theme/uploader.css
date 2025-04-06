@@ -2,11 +2,11 @@
 .upFileBox {
 	outline:2px dashed #92b0b3; outline-offset:-10px; color:#0f3c4b;
 	font-family:"Roboto"; font-weight:400; font-size:20px; display:table;
-	transition:outline-offset .15s ease-in-out, background-color .15s linear;
-	background-color:#c8dadf; user-select:none; width:100%; height:100%;
+	transition:outline-offset .15s ease-in-out, background .15s linear;
+	background:#c8dadf; user-select:none; width:100%; height:100%;
 }
 
-.upDragOver { outline-offset:-20px; outline-color:#c8dadf; background-color:#fff; }
+.upDragOver { outline-offset:-20px; outline-color:#c8dadf; background:#fff; }
 
 /* Centering */
 .upFileBox .upContents {
@@ -16,7 +16,7 @@
 /* Box Content Style */
 .upFileBox .icon {
 	width:100%; height:80px; margin-bottom:40px; background:#92b0b3;
-	-webkit-mask:url(upload.svg) no-repeat center / contain;
+	mask:url(upload.svg) no-repeat center / contain;
 }
 
 .upFileBox input { display:none; }
@@ -34,3 +34,9 @@
 	75%  { transform:scale(1.1); }
 	100% { transform:scale(1); }
 }
+
+/*--- Dark Mode ---*/
+
+html.dark .upFileBox { color:#e2e7e9; outline-color:#a7b8be; background:#303536; }
+html.dark .upFileBox .icon { background:#a7b8be; }
+html.dark .upDragOver { outline-color:#fff; background:#4a4e4f; }

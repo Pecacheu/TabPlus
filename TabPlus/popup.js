@@ -7,9 +7,11 @@ window.onload = () => {
 	main.onclick=() => TabService('openMainPage');
 }
 async function saveTabs(type) {try {
-	let sel={}, p=await TabService('getOpt','SavePinned');
-	if(type == "all" || type == "left" || type == "right") sel={currentWindow:true,pinned:p};
-	else if(type == "only") sel={currentWindow:true,active:true};
-	else if(type == "other") sel={currentWindow:true,active:false,pinned:p};
-	let tabs=await chrome.tabs.query(sel); await TabService('runTabSaver',tabs,type);
+	let sel; switch(type) {
+		case "all": case "left": case "right": sel={currentWindow:true};
+		break; case "only": sel={currentWindow:true,active:true};
+		break; case "other": sel={currentWindow:true,active:false};
+	}
+	let tabs=await chrome.tabs.query(sel);
+	await TabService('runTabSaver',tabs,type);
 } catch(e) {alert(e);throw e}}

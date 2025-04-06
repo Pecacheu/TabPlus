@@ -1,34 +1,44 @@
 <!-- TabPlus Options. Ray 2016, All rights reserved -->
 <html><head>
 <title>TabPlus Options</title>
-<script src="utils.js"></script><script src="options.js"></script>
-<style>
-body {
-	width:800px; font:12pt "Roboto",'Lucida Grande','Lucida Sans','DejaVu Sans',Verdana,sans-serif;
-}
-a { color:#44f; text-decoration:none; cursor:pointer; }
-a:hover { color:#00a; text-decoration:underline; }
-.item {
-	border-radius:5px; padding:1em; background-color:#f7f7f7;
-	box-shadow:0 2px 4px rgba(0,0,0,0.15),0 0 3px rgba(0,0,0,0.15);
-}
-button {
-	background:#a00; border:none; border-radius:5px;
-	color:#fff; box-shadow:0 0 3px #000; padding:5px 10px;
-}
-button:active { background:#500; box-shadow:none; }
-</style>
+<link rel=stylesheet href=theme/options.css></link>
+<script src=utils.js></script><script src=options.js></script>
 </head><body>
 <h1>Options</h1>
-<p><button id=bRst>Reset All Data</button></p>
-<p style="color:grey">(More coming soon!)</p>
+<div id=oCont>
+	<div class="form-check form-switch">
+		<input id=DarkMode type=checkbox class=form-check-input>
+		<label for=DarkMode class=form-check-label>Dark Mode</label>
+	</div>
+	<div class="form-check form-switch">
+		<input id=SavePinned type=checkbox class=form-check-input>
+		<label for=SavePinned class=form-check-label>Save pinned tabs</label>
+	</div>
+	<label for=NewWindows class=form-label>Open new windows</label>
+	<select id=NewWindows class=form-select>
+		<option value=0>Never</option>
+		<option value=1>When no unpinned tabs</option>
+		<option value=2>Always</option>
+	</select>
+	<label for=TabDelay class=form-label>Tab delay in ms (0 to disable)</label>
+	<input id=TabDelay class=form-control>
+	<label for=NoDelayTabs class=form-label>Max tabs to close before delay</label>
+	<input id=NoDelayTabs class=form-control>
+	<button id=bRst class="btn btn-danger">Reset All Data</button>
+</div>
+<div id=diag class="modal fade"><div class=modal-dialog><div class=modal-content>
+	<div class=modal-header><h3 class=modal-title>Are you sure?</h3><button id=dc1 class=btn-close></button></div>
+	<div class=modal-body><p>This will erase all your tabs (local and synced) and reset all settings to the default.</p></div>
+	<div class=modal-footer><button id=dc2 class="btn btn-secondary">Cancel</button><button id=dcc class="btn btn-danger">Confirm</button></div>
+</div></div></div>
+<div id=diagBg class="modal-backdrop fade"></div>
 <h1>How to use TabPlus</h1>
 <h3>Add tabs</h3>
 <p>Use the buttons in the Tab++ popup. It will automatically open TabPlus and load your tabs to the local-mode section.</p>
 <h3>Open tabs</h3>
 <p>Click on a tab's name to reopen it. Hold shift to open the whole TabList. Not that tabs in unlocked lists will self-delete when you reopen then.</p>
 <h3>Delete tabs</h3>
-<p>Hover over the tab's icon. Unless the TabList is locked, it will change to an <i>x</i>. Click it to delete the tab. Hold shift to delete the entire TabList.</p>
+<p>Hover over the tab's icon. Unless the TabList is locked, it will change to an <i>x</i>. Click it to delete the tab. Hold shift to delete the entire TabList. To delete a folder, hold shift and an <i>x</i> will appear.</p>
 <h3>Name TabLists</h3>
 <p>Click on a TabList's tab count to give it a name, or click on its existing name to rename it. Technically, TabLists always have a name, but any name of the format <i>'_[n]'</i> is automatically hidden.</p>
 <p>You cannot have 2 TabLists in the same folder with the same name. Trying to do so (or pressing the <i>ESCAPE</i> key) will simply cancel the name change. The same applies to folder name changes.</p>

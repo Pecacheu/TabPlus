@@ -1,5 +1,5 @@
 //HTML5 Uploader API 1.15. Ray 2016, All rights reserved
-//Requires 'uploader.css' & 'upload.svg'
+//Requires uploader.css & upload.svg
 
 'use strict';
 function Uploader(extList, parent, maxFiles, doneMsg) {

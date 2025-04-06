@@ -2,44 +2,41 @@
 
 'use strict';
 const VER='v'+chrome.runtime.getManifest().version;
-/*function TestStore() {
-	let s={}; this.get=async () => utils.copy(s);
-	this.set=async o => {for(let k in o) s[k]=utils.copy(o[k])}
-	this.remove=async kl => {kl.each(k => {delete s[k]})}
-	this.clear=async () => {s={}}
-}*/
-
 function TabManager(useTabs) {
 	this.sTypes=['local','sync'], this.NameFilter=/[^ -.0-\[\]^_a-z|]/g,
 	this.PathTest=/^(\/[ -.0-\[\]^_a-z|]+)*\/~?[ -.0-\[\]^_a-z|]+$/;
 	const NameRpl=/[^\x00-\x7F]/g, sDb=[chrome.storage.local,chrome.storage.sync],
 	SyncDelay=1000; //Min cooldown after sync
-	let lo,tabs=[],back=[],tc=[],dSync=[];
+	let tabs=[],back=[],tc=[],dSync=[];
 
 	//Extension Options
-	const opts={
-		NameMaxLen:30, //Max TabList/folder name length
-		TNameMax:100, //Max tab name length
-		NoDelayTabs:15, //Max tabs before auto-delay
+	this.NameMaxLen=30, //Max TabList/folder name length
+	this.TNameMax=150; //Max total path length
+	const DefaultOpts={
+		DarkMode:0, //Dark mode
+		SavePinned:0, //Save pinned tabs
+		NewWindows:1, //0:Never, 1:When no tabs, 2:Always
 		TabDelay:500, //Auto-delay (ms)
-		//SavePinned:0, //Save pinned tabs TODO: Not yet implemented
-		NewWindows:1, //0:Never, 1:When No Other Tabs, 2:Always
+		NoDelayTabs:15, //Max tabs before auto-delay
 		TPVer:0
 	}
 	this.loadOpts=async () => {
-		lo=1; let o=await sDb[1].get(opts),k; for(k in o) this[k]=o[k];
-		if(useTabs && this.TPVer!=VER) {
+		let o=await sDb[1].get('opts'),k;
+		this.opts=DefaultOpts; if(o.opts) o=o.opts;
+		for(k in o) if(k in this.opts) this.opts[k]=o[k];
+		if(useTabs && this.opts.TPVer!=VER) {
 			if(this.onFirstLoad) this.onFirstLoad();
-			this.TPVer=VER,await this.setOpts();
+			this.opts.TPVer=VER; await this.setOpts();
 		}
-	}, this.setOpts=async () => {
-		let o={},k; for(k in opts) o[k]=this[k]; await sDb[1].set(o);
+	}, this.setOpts=async o => {
+		if(o) this.opts=o;
+		await sDb[1].set({opts:this.opts});
 	}
 
 	//General
 	utils.define(this, 'totalTabs', () => tc[0]+tc[1]);
 	this.loadTabStore=async nTl => {
-		if(!lo) await this.loadOpts();
+		if(!this.opts) await this.loadOpts();
 		await this.awaitSync(); dSync.s=Object.keys(tabs);
 		if(nTl) {
 			for(let i=0,l=nTl.length,n; i<l; ++i) if(n=nTl[i])
@@ -49,18 +46,20 @@ function TabManager(useTabs) {
 		dSync.s=0;
 	}
 	let getUse=async () => {
-		this.totalUse=Math.floor(await sDb[1].getBytesInUse()/sDb[1].QUOTA_BYTES*100)+'%';
+		this.totalUse=Math.round(await sDb[1].getBytesInUse()/sDb[1].QUOTA_BYTES*100)+'%';
 	}, loadTabs=async (s,db) => {try {
-		let d=db||await sDb[s].get(), dd=tabs[s]={},
-		ss=this.sTypes[s], tt=0,rd,k,p,t,n,di;
+		let d=db||await sDb[s].get(), dd=tabs[s]={}, ss=this.sTypes[s],
+			tt=0,rd,k,p,t,n,di;
+		function delBad() {
+			if(!rd) alert("Corrupt data was found. Cleaning..."),dd=[],rd=1;
+			dd.push(k); console.log("Del bad",ss+k);
+		}
 		for(k in d) if(k[0]=='/') {
 			di=k.lastIndexOf('/'),p=k.substr(0,di),t=k.substr(di+1),n=d[k];
-			if(di==-1 || !this.PathTest.test(k) || d[p+'/~'+t] || d[p]
-			|| !Array.isArray(n) || !testDate(n[0]) || !Array.isArray(n[1])) {
-				if(!rd) alert("Corrupt data was found. Cleaning..."),dd=[],rd=1;
-				dd.push(k); console.log("Del bad",ss+k);
-			} else dd[k]=n, tt+=n.length-1, n.each(t => {t[0]=trimTab(t[0])},1);
-		}
+			if(di==-1 || !this.PathTest.test(k) || d[p+'/~'+t] || d[p] ||
+				!Array.isArray(n) || !testDate(n[0]) || !Array.isArray(n[1])) delBad();
+			else dd[k]=n, tt+=n.length-1, n.each(t => {t[0]=trimTab(t[0])},1);
+		} else if(k!='opts') delBad();
 		if(rd) {await sDb[s].remove(dd);return loadTabs(s)}
 		tc[s]=tt, back[s]=db?{}:utils.copy(dd); console.log("READ",ss,tt,dd);
 	} catch(e) {throw "Error reading database:\n"+e}},
